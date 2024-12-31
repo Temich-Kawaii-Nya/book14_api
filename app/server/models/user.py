@@ -1,5 +1,5 @@
 from beanie import Document
-from pydantic import EmailStr, BaseModel
+from pydantic import EmailStr, BaseModel, Field, validator
 from datetime import datetime
 from typing import List, Optional
 
@@ -9,15 +9,15 @@ from  app.server.models.quote import Quote
 
 
 class User(Document):
-    username: str
-    email: EmailStr
-    password: str
+    username: str = Field(..., min_length=3)
+    email: EmailStr = Field()
+    password: str = Field(..., min_length=6)
     created_at: datetime
-    password: str
     userBooks: List[Book]
     collections: List[Collection]
     quotes: List[Quote]
     favourites: List[str]
+
     class Settings:
         name = "users"
 
