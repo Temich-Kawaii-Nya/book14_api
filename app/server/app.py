@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from .db.database import init_db
-from .routes.users import router
+from app.server.db.database import init_db
+from app.server.routes.users import router
 app = FastAPI()
 app.include_router(router, tags=["Users"], prefix="/users")
 
