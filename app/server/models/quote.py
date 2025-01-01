@@ -1,13 +1,8 @@
 from datetime import datetime
-from typing import Optional, Annotated
+from typing import Optional
 
-from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, Field, PlainSerializer
-
-SerializedObjectId = Annotated[
-    PydanticObjectId,
-    PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
-]
+from beanie import Document
+from pydantic import BaseModel, Field
 
 class Quote(Document):
     book_id: str = Field()

@@ -15,7 +15,7 @@ class User(Document):
     userBooks: List[Book]
     collections: List[Collection]
     quotes: List[Quote]
-    favourites: List[str]
+    favourites: List[PydanticObjectId]
     class Settings:
         name = "users"
 
