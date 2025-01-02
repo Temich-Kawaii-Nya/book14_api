@@ -1,6 +1,7 @@
-from app.server.models.user import User
-from app.server.models.description import Description
-from app.server.Config import Config
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from app.server.config import Config
 from app.server.models.book import Book
 from app.server.models.collection import Collection
 from app.server.models.quote import Quote
