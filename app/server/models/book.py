@@ -1,11 +1,13 @@
-from datetime import datetime
-from typing import Optional
-
-from beanie import Document
-from pydantic import BaseModel
-
+from typing import Optional, Annotated
+from pydantic import BaseModel, PlainSerializer
 from app.server.models.description import Description
+from beanie import Document, PydanticObjectId
+from datetime import datetime
 
+SerializedObjectId = Annotated[
+    PydanticObjectId,
+    PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
+]
 
 class Book(Document):
     isnb: str

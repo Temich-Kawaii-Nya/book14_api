@@ -1,7 +1,11 @@
-from typing import List, Optional
-from beanie import Document
-from pydantic import BaseModel, Field
+from typing import List, Optional, Annotated
+from beanie import Document, PydanticObjectId
+from pydantic import BaseModel, Field, PlainSerializer
 
+SerializedObjectId = Annotated[
+    PydanticObjectId,
+    PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
+]
 
 class Collection(Document):
     collection_name: str = Field(..., min_length=1)

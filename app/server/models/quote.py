@@ -4,7 +4,6 @@ from typing import Optional
 from beanie import Document
 from pydantic import BaseModel, Field
 
-
 class Quote(Document):
     book_id: str = Field()
     text: str = Field(..., min_length=1)
