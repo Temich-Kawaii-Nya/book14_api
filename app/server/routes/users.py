@@ -1,8 +1,9 @@
 from typing import Annotated, List
 
 from beanie import PydanticObjectId
+from beanie.odm.utils.pydantic import parse_object_as
 from fastapi import APIRouter, HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 import jwt
 import logging
@@ -11,16 +12,17 @@ from jwt import InvalidTokenError
 from pydantic import BaseModel, EmailStr
 from pymongo.errors import DuplicateKeyError
 
-from app.server.models.user import User
+from app.server.models.user import User, SignupData, Token, LoginData
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from app.server.config import config
+from app.server.repositories.user_repository import UserRepository
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 logging.basicConfig(level=logging.INFO)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+user_rep = UserRepository()
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(
@@ -35,7 +37,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
             raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
-    user = await User.find_one({"username": username})
+    user = await user_rep.get_user_by_name(username=username)
     if user is None:
         raise credentials_exception
     return user
@@ -43,10 +45,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
 
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=Token)
 async def create_user(signup_data: SignupData):
-    user_with_username = await User.find_one({"username": signup_data.username})
+    user_with_username = await user_rep.get_user_by_name(username=signup_data.username)
     if user_with_username is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken")
-    user_with_email = await User.find_one({"email": signup_data.email})
+    user_with_email = await user_rep.get_user_by_email(email=signup_data.email)
     if user_with_email is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already taken")
     hashed_password = hash_password(signup_data.password)
@@ -59,18 +61,18 @@ async def create_user(signup_data: SignupData):
         collections=[],
         quotes=[],
         favourites=[])
-    await User.insert_one(user)
+    await user_rep.add_user(user=user)
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)
-async def login(user: LoginData):
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     try:
         logging.info("Attempting to find user by email")
-        user_dict = await User.find_one({"email": user.email})
+        user_dict = await user_rep.get_user_by_email(email=parse_object_as(EmailStr, form_data.username))
         if not user_dict:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-        if not verify_password(user.password, user_dict.password):
+        if not verify_password(form_data.password, user_dict.password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         logging.info(user_dict.id)
         access_token = create_access_token(data={"sub": user_dict.username})

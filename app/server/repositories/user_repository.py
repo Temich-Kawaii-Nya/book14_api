@@ -1,9 +1,18 @@
 from abc import ABC, abstractmethod
-
+from datetime import datetime, timedelta
+from typing import Optional
+import jwt
 from beanie import PydanticObjectId
+from jwt import InvalidTokenError, PyJWTError
+from passlib.context import CryptContext
+from pydantic import EmailStr
 
-from app.server.models.user import User
+from app.server.config import config
+from app.server.models.user import User, SignupData, LoginData
 from app.server.repositories.repository_error import RepositoryError
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class IUserRepository(ABC):
     """
@@ -93,5 +102,7 @@ class UserRepository(IUserRepository, ABC):
     async def get_user_by_id(self, user_id: PydanticObjectId) -> RepositoryError | User:
         return await User.get(user_id)
 
-    async def get_user_by_email(self, email: str) -> RepositoryError | User:
+    async def get_user_by_email(self, email: EmailStr) -> RepositoryError | User:
         return await User.find_one(User.email == email)
+    async def get_user_by_name(self, username: str) -> RepositoryError | User:
+        return await User.find_one(User.username == username)
