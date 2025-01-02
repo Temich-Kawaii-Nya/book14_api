@@ -12,22 +12,53 @@ class IUserRepository(ABC):
 
     @abstractmethod
     async def add_user(self, user: User) -> RepositoryError | None:
+        """
+        Add a new user to the database.
+
+        :param user: The user object to add.
+        :return: RepositoryError if an error occurs, otherwise None.
+        """
         pass
 
     @abstractmethod
     async def delete_user(self, user_id: PydanticObjectId) -> RepositoryError | None:
+        """
+        Delete a user by their ID.
+
+        :param user_id: The ID of the user to delete.
+        :return: RepositoryError if an error occurs, otherwise None.
+        """
         pass
 
     @abstractmethod
     async def update_user(self, user_id: PydanticObjectId, updated_data: dict) -> RepositoryError | None:
+        """
+        Update user data.
+
+        :param user_id: The ID of the user to update.
+        :param updated_data: A dictionary of the updated user data.
+        :return: RepositoryError if an error occurs, otherwise None.
+        """
         pass
 
     @abstractmethod
     async def get_user_by_id(self, user_id: PydanticObjectId) -> RepositoryError | User:
+        """
+        Retrieve a user by their ID.
+
+        :param user_id: The ID of the user to retrieve.
+        :return: The User object if found, otherwise None.
+        """
         pass
 
     @abstractmethod
     async def get_user_by_email(self, email: str) -> RepositoryError | User:
+        """
+        Retrieve a user by their email.
+
+        :param email: The email of the user to retrieve.
+        :return: The User object if found, otherwise None.
+        """
         pass
 
 class UserRepository(IUserRepository, ABC):
