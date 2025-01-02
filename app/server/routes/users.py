@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from beanie import PydanticObjectId
 from fastapi import APIRouter, HTTPException, status, Depends
@@ -8,34 +8,19 @@ import jwt
 import logging
 
 from jwt import InvalidTokenError
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from pymongo.errors import DuplicateKeyError
 
 from app.server.models.user import User
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from app.server.config import Config
+from app.server.config import config
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 logging.basicConfig(level=logging.INFO)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class LoginData(BaseModel):
-    email: str
-    password: str
-
-
-class SignupData(BaseModel):
-    username: str
-    password: str
-    email: str
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(
@@ -44,7 +29,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms="HS256")
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
@@ -93,7 +78,7 @@ async def login(user: LoginData):
         return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:
         raise HTTPException(status_code=401)
-@router.get("/", status_code=status.HTTP_200_OK, response_model=User)
+@router.get("/", status_code=status.HTTP_200_OK)
 async def read_user(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
 
@@ -104,13 +89,13 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm="HS256")
+    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm="HS256")
     return encoded_jwt
 
 
 def decode_access_token(token: str):
     try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=["HS256"])
+        payload = jwt.decode(token, config.SECRET_KEY, algorithms=["HS256"])
         return payload
     except jwt.PyJWTError:
         return None

@@ -15,8 +15,7 @@ class User(Document):
     userBooks: List[Book]
     collections: List[Collection]
     quotes: List[Quote]
-
-    favourites: List[PydanticObjectId]
+    favourites: List[str]
     class Settings:
         name = "users"
 
@@ -28,3 +27,25 @@ class UpdateUser(BaseModel):
     collection: Optional[List[Collection]]
     quotes: Optional[List[Quote]]
     favourites: Optional[List[str]]
+
+class UserResponse(BaseModel):
+    created_at: datetime
+    userBooks: List[Book]
+    collections: List[Collection]
+    quotes: List[Quote]
+    favourites: List[str]
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class LoginData(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class SignupData(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
