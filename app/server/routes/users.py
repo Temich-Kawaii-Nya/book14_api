@@ -61,6 +61,9 @@ async def create_user(signup_data: SignupData):
     user_with_username = await User.find_one({"username": signup_data.username})
     if user_with_username is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken")
+    user_with_email = await User.find_one({"email": signup_data.email})
+    if user_with_email is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already taken")
     hashed_password = hash_password(signup_data.password)
     user = User(
         username=signup_data.username,
@@ -71,7 +74,7 @@ async def create_user(signup_data: SignupData):
         collections=[],
         quotes=[],
         favourites=[])
-    await user.insert()
+    await User.insert_one(user)
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)

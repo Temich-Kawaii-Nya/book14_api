@@ -4,33 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/server/middlewares/token_validation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/book14_api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/book14_api.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/Config/Config.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/Config/Config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/db/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/db/database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/models/user.py" afterDir="false" />
+    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="authorization with middleware( not working rn)">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/Activate.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/activate" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/activate.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/deactivate.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/dotenv.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/email_validator.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/fastapi.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/httpx.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/markdown-it.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/pip.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/pip3.12.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/pip3.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/pygmentize.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/python.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/pythonw.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/typer.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/uvicorn.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/book14_env/Scripts/watchfiles.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +23,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;miyazaki1707&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Temich-Kawaii-Nya/book14_api.git&quot;,
+    &quot;accountId&quot;: &quot;cd81829f-5171-413c-bb03-0aaa553aeeeb&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -97,8 +85,28 @@
       <workItem from="1735714068175" duration="1632000" />
       <workItem from="1735715721978" duration="5398000" />
       <workItem from="1735726600702" duration="2624000" />
-      <workItem from="1735729243500" duration="649000" />
+      <workItem from="1735729243500" duration="951000" />
+      <workItem from="1735730276672" duration="103000" />
+      <workItem from="1735742669245" duration="1553000" />
+      <workItem from="1735790961832" duration="1758000" />
     </task>
+    <task id="LOCAL-00001" summary="authorization with middleware( not working rn)">
+      <option name="closed" value="true" />
+      <created>1735729935371</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1735729935371</updated>
+    </task>
+    <task id="LOCAL-00002" summary="authorization with middleware( not working rn)">
+      <option name="closed" value="true" />
+      <created>1735729965423</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1735729965423</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,9 +123,13 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="authorization with middleware( not working rn)" />
+    <option name="LAST_COMMIT_MESSAGE" value="authorization with middleware( not working rn)" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/book14_api$app.coverage" NAME="app Coverage Results" MODIFIED="1735707400386" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server" />
-    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735729564996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
-    <SUITE FILE_PATH="coverage/book14_api$users.coverage" NAME="users Coverage Results" MODIFIED="1735724923382" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
+    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735792440714" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/book14_api$users.coverage" NAME="users Coverage Results" MODIFIED="1735729705208" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
   </component>
 </project>
