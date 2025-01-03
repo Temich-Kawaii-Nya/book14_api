@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="POST request for collections and middleware was added">
+    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="Changes in collection repository file and add_book_to_collection func was added">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/repositories/collection_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/repositories/collection_repository.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/routes/collections.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/collections.py" afterDir="false" />
@@ -96,7 +96,7 @@
       <workItem from="1735742669245" duration="1553000" />
       <workItem from="1735790961832" duration="3946000" />
       <workItem from="1735819896287" duration="2515000" />
-      <workItem from="1735908093723" duration="4643000" />
+      <workItem from="1735908093723" duration="6745000" />
     </task>
     <task id="LOCAL-00001" summary="authorization with middleware( not working rn)">
       <option name="closed" value="true" />
@@ -138,7 +138,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735913268095</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Changes in collection repository file and add_book_to_collection func was added">
+      <option name="closed" value="true" />
+      <created>1735916649510</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1735916649510</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -159,11 +167,12 @@
     <MESSAGE value="authorization with middleware( not working rn)" />
     <MESSAGE value="auth fixed" />
     <MESSAGE value="POST request for collections and middleware was added" />
-    <option name="LAST_COMMIT_MESSAGE" value="POST request for collections and middleware was added" />
+    <MESSAGE value="Changes in collection repository file and add_book_to_collection func was added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changes in collection repository file and add_book_to_collection func was added" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/book14_api$app.coverage" NAME="app Coverage Results" MODIFIED="1735707400386" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server" />
-    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735915489236" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735918499090" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/book14_api$users.coverage" NAME="users Coverage Results" MODIFIED="1735729705208" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
   </component>
 </project>
