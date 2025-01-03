@@ -1,0 +1,53 @@
+Index: app/server/routes/users.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from typing import Annotated\r\n\r\nfrom beanie import PydanticObjectId\r\nfrom fastapi import APIRouter, HTTPException, status, Depends\r\nfrom fastapi.security import OAuth2PasswordBearer\r\n\r\nimport jwt\r\nimport logging\r\n\r\nfrom jwt import InvalidTokenError\r\nfrom pydantic import BaseModel\r\nfrom pymongo.errors import DuplicateKeyError\r\n\r\nfrom app.server.models.user import User\r\nfrom passlib.context import CryptContext\r\nfrom datetime import datetime, timedelta\r\nfrom app.server.config import Config\r\n\r\nrouter = APIRouter()\r\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"token\")\r\nlogging.basicConfig(level=logging.INFO)\r\npwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\r\n\r\n\r\nclass Token(BaseModel):\r\n    access_token: str\r\n    token_type: str\r\n\r\n\r\nclass LoginData(BaseModel):\r\n    email: str\r\n    password: str\r\n\r\n\r\nclass SignupData(BaseModel):\r\n    username: str\r\n    password: str\r\n    email: str\r\n\r\nasync def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:\r\n    credentials_exception = HTTPException(\r\n        status_code=status.HTTP_401_UNAUTHORIZED,\r\n        detail=\"Could not validate credentials\",\r\n        headers={\"WWW-Authenticate\": \"Bearer\"},\r\n    )\r\n    try:\r\n        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=\"HS256\")\r\n        username: str = payload.get(\"sub\")\r\n        if username is None:\r\n            raise credentials_exception\r\n    except InvalidTokenError:\r\n        raise credentials_exception\r\n    user = await User.find_one({\"username\": username})\r\n    if user is None:\r\n        raise credentials_exception\r\n    return user\r\n\r\n\r\n@router.post(\"/signup\", status_code=status.HTTP_201_CREATED, response_model=Token)\r\nasync def create_user(signup_data: SignupData):\r\n    user_with_username = await User.find_one({\"username\": signup_data.username})\r\n    if user_with_username is not None:\r\n        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=\"Username already taken\")\r\n    user_with_email = await User.find_one({\"email\": signup_data.email})\r\n    if user_with_email is not None:\r\n        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=\"Email already taken\")\r\n    hashed_password = hash_password(signup_data.password)\r\n    user = User(\r\n        username=signup_data.username,\r\n        email=signup_data.email,\r\n        password=hashed_password,\r\n        created_at=datetime.utcnow(),\r\n        userBooks=[],\r\n        collections=[],\r\n        quotes=[],\r\n        favourites=[])\r\n    await User.insert_one(user)\r\n    access_token = create_access_token(data={\"sub\": user.username})\r\n    return {\"access_token\": access_token, \"token_type\": \"bearer\"}\r\n@router.post(\"/login\", status_code=status.HTTP_200_OK, response_model=Token)\r\nasync def login(user: LoginData):\r\n    try:\r\n        logging.info(\"Attempting to find user by email\")\r\n        user_dict = await User.find_one({\"email\": user.email})\r\n        if not user_dict:\r\n            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)\r\n\r\n        if not verify_password(user.password, user_dict.password):\r\n            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)\r\n        logging.info(user_dict.id)\r\n        access_token = create_access_token(data={\"sub\": user_dict.username})\r\n\r\n        return {\"access_token\": access_token, \"token_type\": \"bearer\"}\r\n    except Exception as e:\r\n        raise HTTPException(status_code=401)\r\n@router.get(\"/\", status_code=status.HTTP_200_OK, response_model=User)\r\nasync def read_user(current_user: Annotated[User, Depends(get_current_user)]):\r\n    return current_user\r\n\r\ndef create_access_token(data: dict, expires_delta: timedelta = None):\r\n    to_encode = data.copy()\r\n    if expires_delta:\r\n        expire = datetime.utcnow() + expires_delta\r\n    else:\r\n        expire = datetime.utcnow() + timedelta(minutes=15)\r\n    to_encode.update({\"exp\": expire})\r\n    encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=\"HS256\")\r\n    return encoded_jwt\r\n\r\n\r\ndef decode_access_token(token: str):\r\n    try:\r\n        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[\"HS256\"])\r\n        return payload\r\n    except jwt.PyJWTError:\r\n        return None\r\n\r\n\r\ndef hash_password(password: str) -> str:\r\n    return pwd_context.hash(password)\r\n\r\n\r\ndef verify_password(plain_password: str, hashed_password: str) -> bool:\r\n    return pwd_context.verify(plain_password, hashed_password)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/server/routes/users.py b/app/server/routes/users.py
+--- a/app/server/routes/users.py	(revision 08e10596c29bffaaf4c2dab25721c7320a6ee919)
++++ b/app/server/routes/users.py	(date 1735820686936)
+@@ -1,6 +1,5 @@
+ from typing import Annotated
+ 
+-from beanie import PydanticObjectId
+ from fastapi import APIRouter, HTTPException, status, Depends
+ from fastapi.security import OAuth2PasswordBearer
+ 
+@@ -9,7 +8,6 @@
+ 
+ from jwt import InvalidTokenError
+ from pydantic import BaseModel
+-from pymongo.errors import DuplicateKeyError
+ 
+ from app.server.models.user import User
+ from passlib.context import CryptContext
+@@ -97,6 +95,7 @@
+ async def read_user(current_user: Annotated[User, Depends(get_current_user)]):
+     return current_user
+ 
++
+ def create_access_token(data: dict, expires_delta: timedelta = None):
+     to_encode = data.copy()
+     if expires_delta:
+@@ -106,19 +105,13 @@
+     to_encode.update({"exp": expire})
+     encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm="HS256")
+     return encoded_jwt
+-
+-
+ def decode_access_token(token: str):
+     try:
+         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=["HS256"])
+         return payload
+     except jwt.PyJWTError:
+         return None
+-
+-
+ def hash_password(password: str) -> str:
+     return pwd_context.hash(password)
+-
+-
+ def verify_password(plain_password: str, hashed_password: str) -> bool:
+     return pwd_context.verify(plain_password, hashed_password)
