@@ -77,13 +77,10 @@ class CollectionRepository(ICollectionRepository):
     Implementation of the ICollectionRepository interface for managing collections.
     """
 
-    async def create_collection(self, user_id: PydanticObjectId, collection_name: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
+    async def create_collection(self, user: User, collection_name: str) -> RepositoryError | None:
         new_collection = Collection(collection_name=collection_name, books=[])
-        user_data.collections.append(new_collection)
-        await user_data.save()
+        user.collections.append(new_collection)
+        await user.save()
         return None
 
     async def delete_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId) -> RepositoryError | None:
@@ -97,17 +94,14 @@ class CollectionRepository(ICollectionRepository):
         await user_data.save()
         return None
 
-    async def add_book_to_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
-        collection = next((col for col in user_data.collections if col.id == collection_id), None)
+    async def add_book_to_collection(self, user: User, collection_id: int, book_id: str) -> RepositoryError | None:
+        collection = user.collections[collection_id]
         if not collection:
             return RepositoryError(message=f"Collection with ID {collection_id} not found.")
         if book_id in collection.books:
             return RepositoryError(message=f"Book with ID {book_id} is already in the collection.")
         collection.books.append(book_id)
-        await user_data.save()
+        await user.save()
         return None
 
     async def remove_book_from_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:

@@ -1,33 +1,24 @@
 from typing import Annotated
 
 from beanie import PydanticObjectId
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status, Depends
 
 from app.server.models.book import Book
 from app.server.models.user import User
 from app.server.models.collection import Collection
 from app.server.middlewares.token_validation import validate_token
-
+from app.server.repositories.collection_repository import CollectionRepository
 
 router = APIRouter()
+collection_repo = CollectionRepository()
 #add new collection to user
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def add_book_to_user(collection: Collection, current_user: Annotated[User, Depends(validate_token)]):
-    return  current_user
-    # if not user_data:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail=f"User with id {user_id} not found",
-    #     )
-    # # if any(book.isnb == isnb for book in user_data.userBooks):
-    # #     raise HTTPException(
-    # #         status_code=status.HTTP_400_BAD_REQUEST,
-    # #         detail=f"Book with ISNB {isnb} is already added to the user."
-    # #     )
-    # if not user_data.userBooks:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_100_CONTINUE
-    #     )
-    # user_data.userBooks.append(book)
-    # await user_data.save()
+async def add_collection(collection_name: str, current_user: Annotated[User, Depends(validate_token)]):
+    await collection_repo.create_collection(current_user, collection_name)
+    return {"Success": True}
 
+@router.post("/add_book/{collection_id}")
+async def add_book_to_collection(collection_id: int, book_id: str, current_user: Annotated[User, Depends(validate_token)]):
+    await  collection_repo.add_book_to_collection(current_user, collection_id, book_id)
+    return {"Success": True}
