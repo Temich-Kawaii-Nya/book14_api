@@ -11,7 +11,7 @@ from jwt import InvalidTokenError
 from pydantic import BaseModel, EmailStr
 from pymongo.errors import DuplicateKeyError
 
-from app.server.models.user import User
+from app.server.models.user import User, SignupData, Token, LoginData
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from app.server.config import config
