@@ -89,7 +89,7 @@ class QuoteRepository(IQuoteRepository, ABC):
     """
     Implementation of the IQuoteRepository interface for managing quotes.
     """
-    async def add_quote_to_book(self, user: User, book_id: str, text: str):
+    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str):
         if not any(book.id == book_id for book in user.userBooks):
             raise RepositoryError(message=f"Book with id {book_id} not found in user's book list", statuscode=404)
         new_quote = Quote(book_id=book_id, text=text, created_at=datetime.now())
@@ -119,5 +119,5 @@ class QuoteRepository(IQuoteRepository, ABC):
         return quote
 
     async def get_quotes_for_book(self, user: User, book_id: PydanticObjectId) -> List[Quote]:
-        quotes_for_book = [quote for quote in user.quotes if quote.book_id == str(book_id)]
+        quotes_for_book = [quote for quote in user.quotes if quote.book_id == book_id]
         return quotes_for_book
