@@ -1,59 +1,112 @@
-from beanie import PydanticObjectId
-from fastapi import APIRouter, HTTPException, status
+import logging
+from http import HTTPStatus
+from typing import Annotated
 
-from app.server.models.book import Book
+from beanie import PydanticObjectId
+from fastapi import APIRouter, HTTPException, status, Depends
+
+from app.server.middlewares.token_validation import validate_token
+from app.server.models.book import Book, UpdateBook
 from app.server.models.user import User
+from app.server.repositories.book_repository import BookRepository
+from app.server.repositories.repository_error import RepositoryError
 
 router = APIRouter()
-#add new book to user
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def add_book_to_user(user_id: PydanticObjectId, book: Book):
-    user_data = await User.get(user_id)
-    if not user_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {user_id} not found",
-        )
-    # if any(book.isnb == isnb for book in user_data.userBooks):
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail=f"Book with ISNB {isnb} is already added to the user."
-    #     )
-    if not user_data.userBooks:
-        raise HTTPException(
-            status_code=status.HTTP_100_CONTINUE
-        )
-    user_data.userBooks.append(book)
-    await user_data.save()
+book_rep_instance = BookRepository()
 
+def get_book_repository() -> BookRepository:
+    return book_rep_instance
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def add_book_to_user(
+        user: Annotated[User, Depends(validate_token)],
+        book: Book,
+        book_rep: BookRepository = Depends(get_book_repository
+
+    )):
+    """
+    :param user: The model of current user
+    :param book: The model of book
+    :param book_rep: Repository class for books
+    :returns book: Added book
+    """
+    try:
+        await book_rep.add_book_to_user(user.id, book)
+        return book
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
 
 @router.delete("/", status_code=status.HTTP_200_OK)
-async def delete_book_from_user(user_id: PydanticObjectId, book_id: PydanticObjectId):
-    user_data = await User.get(user_id)
-    if not user_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"User with id {user_id} not found",
-        )
-    book_to_remove = next((book for book in user_data.userBooks if book.id == book_id), None)
-    if not book_to_remove:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No book with id {book_id} belongs to user",
-        )
-    user_data.userBooks.remove(book_to_remove)
-    await user_data.save()
+async def delete_book_from_user(
+        user: Annotated[User, Depends(validate_token)],
+        book_id: PydanticObjectId,
+        book_rep: BookRepository = Depends(get_book_repository)):
+    """
+        :param user: The model of current user
+        :param book_id: ID of book
+        :param book_rep: Repository class for books
+        :returns book: ID of removed book
+    """
+    try:
+        await book_rep.delete_book_from_user(user.id, book_id)
+        return book_id
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+@router.put("/{book_id}", status_code=status.HTTP_200_OK)
+async def update_book_from_user(
+        user: Annotated[User, Depends(validate_token)],
+        book_id: PydanticObjectId,
+        new_data: UpdateBook,
+        book_rep: BookRepository = Depends(get_book_repository)):
+    """
+        :param user: The model of current user
+        :param book_id: ID of book
+        :param new_data: New book data
+        :param book_rep: Repository class for books
+        :returns book: New book data
+    """
+    try:
+        book = await book_rep.update_book(user.id, book_id, new_data)
+        return book
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
 
-@router.get("/{user_id}")
-async def get_all_books(user_id: PydanticObjectId):
-    user_data = await User.get(user_id)
+@router.get("/")
+async def get_all_books(
+        user: Annotated[User, Depends(validate_token)],
+        book_rep: BookRepository = Depends(get_book_repository)):
+    """
+        :param user: The model of current user
+        :param book_rep: Repository class for books
+        :returns List[book]: List of user books
+    """
+    try:
+        books = await book_rep.get_all_books(user.id)
+        return books
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
+@router.get("/")
+async def get_all_books(
+        user: Annotated[User, Depends(validate_token)],
+        book_rep: BookRepository = Depends(get_book_repository)):
+    """
+        :param user: The model of current user
+        :param book_rep: Repository class for books
+        :returns List[book]: List of user books
+    """
+    try:
+        books = await book_rep.get_all_books(user.id)
+        return books
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
 
-    if not user_data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} not found"
-        )
-    if not user_data.userBooks:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"User with id {user_id} does not have any books"
-        )
-    return user_data.userBooks

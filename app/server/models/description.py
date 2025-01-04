@@ -4,12 +4,7 @@ from typing import Optional, Annotated
 from beanie import Document, PydanticObjectId
 from pydantic import BaseModel, Field, PlainSerializer
 
-SerializedObjectId = Annotated[
-    PydanticObjectId,
-    PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
-]
-
-class Description(Document):
+class Description(BaseModel):
     title: str = Field(..., min_length=1)
     description: str
     author_name: str

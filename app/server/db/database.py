@@ -13,4 +13,4 @@ from app.server.models.user import User
 
 async def init_db():
     client = AsyncIOMotorClient(config.DATABASE_URL)
-    await init_beanie(database=client[config.DATABASE_NAME], document_models=[Book, Quote, Collection, Description, User])
+    await init_beanie(database=client[config.DATABASE_NAME], document_models=[Quote, Collection, User])
