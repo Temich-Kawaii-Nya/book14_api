@@ -9,11 +9,12 @@ from app.server.middlewares.token_validation import validate_token
 from app.server.models.book import Book, UpdateBook
 from app.server.models.user import User
 from app.server.repositories.book_repository import BookRepository
+from app.server.repositories.book_search_context import IGoogleBooksContext
 from app.server.repositories.repository_error import RepositoryError
 
 router = APIRouter()
 book_rep_instance = BookRepository()
-
+book_search = IGoogleBooksContext()
 def get_book_repository() -> BookRepository:
     return book_rep_instance
 
@@ -22,7 +23,6 @@ async def add_book_to_user(
         user: Annotated[User, Depends(validate_token)],
         book: Book,
         book_rep: BookRepository = Depends(get_book_repository
-
     )):
     """
     :param user: The model of current user
@@ -31,7 +31,7 @@ async def add_book_to_user(
     :returns book: Added book
     """
     try:
-        await book_rep.add_book_to_user(user.id, book)
+        await book_rep.add_book_to_user(user, book)
         return book
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
@@ -50,7 +50,7 @@ async def delete_book_from_user(
         :returns book: ID of removed book
     """
     try:
-        await book_rep.delete_book_from_user(user.id, book_id)
+        await book_rep.delete_book_from_user(user, book_id)
         return book_id
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
@@ -93,20 +93,33 @@ async def get_all_books(
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
-@router.get("/")
-async def get_all_books(
+@router.get("/{book_id}")
+async def get_book(
         user: Annotated[User, Depends(validate_token)],
+        book_id: PydanticObjectId,
         book_rep: BookRepository = Depends(get_book_repository)):
     """
         :param user: The model of current user
+        :param book_id: The id of the book
         :param book_rep: Repository class for books
-        :returns List[book]: List of user books
+        :returns book: The model of book
     """
     try:
-        books = await book_rep.get_all_books(user)
-        return books
+        book = await book_rep.get_book_by_id(user, book_id)
+        return book
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
-
+@router.get("/{isnb}")
+async def find_book(
+        user: Annotated[User, Depends(validate_token)],
+        isnb: str,
+        book_rep: BookRepository = Depends(get_book_repository)):
+    try:
+        book = await book_search.find_book(isnb)
+        return book
+    except RepositoryError as e:
+        raise HTTPException(status_code=e.code, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=e)
