@@ -70,7 +70,7 @@ async def update_book_from_user(
         :returns book: New book data
     """
     try:
-        book = await book_rep.update_book(user.id, book_id, new_data)
+        book = await book_rep.update_book(user, book_id, new_data)
         return book
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
@@ -87,7 +87,7 @@ async def get_all_books(
         :returns List[book]: List of user books
     """
     try:
-        books = await book_rep.get_all_books(user.id)
+        books = await book_rep.get_all_books(user)
         return books
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
@@ -103,7 +103,7 @@ async def get_all_books(
         :returns List[book]: List of user books
     """
     try:
-        books = await book_rep.get_all_books(user.id)
+        books = await book_rep.get_all_books(user)
         return books
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)

@@ -1,17 +1,10 @@
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
-from typing import Optional
-import jwt
+
 from beanie import PydanticObjectId
-from jwt import InvalidTokenError, PyJWTError
-from passlib.context import CryptContext
 from pydantic import EmailStr
 
-from app.server.config import config
-from app.server.models.user import User, SignupData, LoginData
+from app.server.models.user import User
 from app.server.repositories.repository_error import RepositoryError
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class IUserRepository(ABC):

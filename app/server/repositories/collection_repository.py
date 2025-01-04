@@ -90,46 +90,43 @@ class CollectionRepository(ICollectionRepository):
 
     async def get_collection(self, user: User, collection_id: int):
         collection = user.collections[collection_id]
-        return  collection
+        if not collection:
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
+        return collection
 
-    async def create_collection(self, user: User, collection_name: str) -> RepositoryError | None:
+    async def create_collection(self, user: User, collection_name: str):
         new_collection = Collection(collection_name=collection_name, books=[])
         user.collections.append(new_collection)
         await user.save()
-        return None
 
-    async def delete_collection(self, user: User, collection_id: int) -> RepositoryError | None:
+    async def delete_collection(self, user: User, collection_id: int):
         collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
         user.collections.remove(collection)
         await user.save()
-        return None
 
-    async def add_book_to_collection(self, user: User, collection_id: int, book_id: str) -> RepositoryError | None:
+    async def add_book_to_collection(self, user: User, collection_id: int, book_id: str):
         collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
         if book_id in collection.books:
-            return RepositoryError(message=f"Book with ID {book_id} is already in the collection.")
+            raise RepositoryError(message=f"Book with ID {book_id} is already in the collection.")
         collection.books.append(book_id)
         await user.save()
-        return None
 
-    async def remove_book_from_collection(self, user: User, collection_id: int, book_id: str) -> RepositoryError | None:
+    async def remove_book_from_collection(self, user: User, collection_id: int, book_id: str):
         collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.")
         if book_id not in collection.books:
-            return RepositoryError(message=f"Book with ID {book_id} is not in the collection.")
+            raise RepositoryError(message=f"Book with ID {book_id} is not in the collection.")
         collection.books.remove(book_id)
         await user.save()
-        return None
 
-    async def update_collection(self, user: User, collection_id: int, new_name: str) -> RepositoryError | None:
+    async def update_collection(self, user: User, collection_id: int, new_name: str):
         collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.")
         collection.collection_name = new_name
         await user.save()
-        return None
