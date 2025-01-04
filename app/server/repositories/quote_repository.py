@@ -14,12 +14,12 @@ class IQuoteRepository(ABC):
     Interface for managing quotes related to books.
     """
     @abstractmethod
-    async def add_quote_to_book(self, user_id: PydanticObjectId, book_id: PydanticObjectId, text: str) -> RepositoryError | None:
+    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str) -> RepositoryError | None:
         """
         Adds a quote to a specific book for a user.
 
         Args:
-            user_id (PydanticObjectId): The ID of the user.
+            user (User): The model of user.
             book_id (PydanticObjectId): The ID of the book.
             text (str): The text of the quote.
 
@@ -29,12 +29,12 @@ class IQuoteRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_quote(self, user_id: PydanticObjectId, quote_id: PydanticObjectId, new_text: str) -> RepositoryError | None:
+    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str) -> RepositoryError | None:
         """
         Updates the text of a specific quote.
 
         Args:
-            user_id (PydanticObjectId): The ID of the user.
+            user (User): The model of user.
             quote_id (PydanticObjectId): The ID of the quote.
             new_text (str): The new text for the quote.
 
@@ -44,12 +44,12 @@ class IQuoteRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_quote_from_book(self, user_id: PydanticObjectId, quote_id: PydanticObjectId) -> RepositoryError | None:
+    async def remove_quote_from_book(self, user: User, quote_id: PydanticObjectId) -> RepositoryError | None:
         """
         Removes a specific quote from a user's collection.
 
         Args:
-            user_id (PydanticObjectId): The ID of the user.
+            user (User): The model of user.
             quote_id (PydanticObjectId): The ID of the quote to remove.
 
         Returns:
@@ -58,12 +58,25 @@ class IQuoteRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_quotes_for_book(self, user_id: PydanticObjectId, book_id: PydanticObjectId) -> List[Quote] | RepositoryError:
+    async def get_quote_by_id(self, user: User, quote_id: PydanticObjectId) -> Quote:
         """
         Retrieves all quotes for a specific book in the user's collection.
 
         Args:
-            user_id (PydanticObjectId): The ID of the user.
+            user (User): The model of user.
+            quote_id (PydanticObjectId): The ID of the book.
+
+        Returns:
+            Quote: Returns quote model.
+        """
+        pass
+    @abstractmethod
+    async def get_quotes_for_book(self, user: User, book_id: PydanticObjectId) -> List[Quote] | RepositoryError:
+        """
+        Retrieves all quotes for a specific book in the user's collection.
+
+        Args:
+            user (User): The model of user.
             book_id (PydanticObjectId): The ID of the book.
 
         Returns:
@@ -72,48 +85,39 @@ class IQuoteRepository(ABC):
         pass
 
 
-class QuoteRepository(IQuoteRepository):
+class QuoteRepository(IQuoteRepository, ABC):
     """
     Implementation of the IQuoteRepository interface for managing quotes.
     """
-    async def add_quote_to_book(self, user: User, book_id: str, text: str) -> RepositoryError | None:
+    async def add_quote_to_book(self, user: User, book_id: str, text: str):
         if not any(book.id == book_id for book in user.userBooks):
-            return RepositoryError(message=f"Book with id {book_id} not found in user's book list")
-        new_quote = Quote(book_id=book_id, text=text, created_at=datetime.utcnow())
+            raise RepositoryError(message=f"Book with id {book_id} not found in user's book list", statuscode=404)
+        new_quote = Quote(book_id=book_id, text=text, created_at=datetime.now())
         user.quotes.append(new_quote)
         await user.save()
-        return None
 
-    async def update_quote(self, user_id: PydanticObjectId, quote_id: PydanticObjectId, new_text: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with id {user_id} not found")
-
-        for quote in user_data.quotes:
+    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str):
+        for quote in user.quotes:
             if quote.id == quote_id:
                 quote.text = new_text
-                await user_data.save()
-                return None
+                await user.save()
+                return
+        raise RepositoryError(message=f"Quote with id {quote_id} not found", statuscode=404)
 
-        return RepositoryError(message=f"Quote with id {quote_id} not found")
-
-    async def remove_quote_from_book(self, user_id: PydanticObjectId, quote_id: PydanticObjectId) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with id {user_id} not found")
-
-        for quote in user_data.quotes:
+    async def remove_quote_from_book(self, user: User, quote_id: PydanticObjectId):
+        for quote in user.quotes:
             if quote.id == quote_id:
-                user_data.quotes.remove(quote)
-                await user_data.save()
-                return None
+                user.quotes.remove(quote)
+                await user.save()
+                return
+        raise RepositoryError(message=f"Quote with id {quote_id} not found", statuscode=404)
 
-        return RepositoryError(message=f"Quote with id {quote_id} not found")
+    async def get_quote_by_id(self, user: User, quote_id: PydanticObjectId) -> Quote:
+        quote = next((quote for quote in user.quotes if quote.id == quote_id), None)
+        if not quote:
+            raise RepositoryError(message=f"Quote with id {quote_id} not found.", statuscode=404)
+        return quote
 
-    async def get_quotes_for_book(self, user_id: PydanticObjectId, book_id: PydanticObjectId) -> List[Quote] | RepositoryError:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with id {user_id} not found")
-
-        quotes_for_book = [quote for quote in user_data.quotes if quote.book_id == str(book_id)]
+    async def get_quotes_for_book(self, user: User, book_id: PydanticObjectId) -> List[Quote]:
+        quotes_for_book = [quote for quote in user.quotes if quote.book_id == str(book_id)]
         return quotes_for_book

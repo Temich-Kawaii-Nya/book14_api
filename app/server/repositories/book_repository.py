@@ -70,7 +70,7 @@ class IBookRepository(ABC):
 class BookRepository(IBookRepository, ABC):
     async def add_book_to_user(self, user: User, book: Book):
         if any(existing_book.isnb == book.isnb for existing_book in user.userBooks):
-            raise RepositoryError(message=f"Book with ISNB {book.isnb} is already added to the user.")
+            raise RepositoryError(message=f"Book with ISNB {book.isnb} is already added to the user.", statuscode=400)
         user.userBooks.append(book)
         await user.save()
 
