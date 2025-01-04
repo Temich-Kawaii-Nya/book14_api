@@ -8,6 +8,7 @@ from starlette import status
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 from app.server.config import config
 from app.server.models.user import User
 

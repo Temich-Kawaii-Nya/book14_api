@@ -1,14 +1,6 @@
-from typing import Optional, TypeVar
-
-from pydantic import BaseModel
-from typing_extensions import Generic
-
-T = TypeVar("T")
-
-class RepositoryError(BaseModel):
+class RepositoryError(BaseException):
     message: str
-
-class Result(Generic[T]):
-    def __init__(self, value: Optional[T] = None, error: Optional[RepositoryError] = None):
-        self.value = value
-        self.error = error
+    code: int
+    def __init__(self, message: str, statuscode: int):
+        self.message = message
+        self.code = statuscode
