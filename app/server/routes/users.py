@@ -7,6 +7,12 @@ from beanie.odm.utils.pydantic import parse_object_as
 from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError
+
+from pydantic import BaseModel, EmailStr
+from pymongo.errors import DuplicateKeyError
+
+from app.server.models.user import User, SignupData, Token, LoginData
+
 from passlib.context import CryptContext
 from pydantic import EmailStr
 

@@ -10,3 +10,7 @@ class Quote(Document):
     created_at: datetime
 class UpdateQuote(BaseModel):
     text: Optional[str]
+
+class CreateQuote(BaseModel):
+    book_id: str
+    text: str
