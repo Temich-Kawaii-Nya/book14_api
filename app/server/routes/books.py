@@ -9,7 +9,7 @@ from app.server.middlewares.token_validation import validate_token
 from app.server.models.book import Book, UpdateBook
 from app.server.models.user import User
 from app.server.repositories.book_repository import BookRepository
-from app.server.repositories.book_search_context import IGoogleBooksContext
+from app.server.repositories.book_search_context import IGoogleBooksContext, SearchBookModel
 from app.server.repositories.repository_error import RepositoryError
 
 router = APIRouter()
@@ -111,13 +111,12 @@ async def get_book(
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=e)
-@router.get("/{isnb}")
+@router.post("/find/")
 async def find_book(
         user: Annotated[User, Depends(validate_token)],
-        isnb: str,
-        book_rep: BookRepository = Depends(get_book_repository)):
+        query_model: SearchBookModel):
     try:
-        book = await book_search.find_book(isnb)
+        book = await book_search.find_book(query_model)
         return book
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)

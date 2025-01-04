@@ -10,10 +10,10 @@ from app.server.models.description import Description
 class Book(BaseModel):
     id: PydanticObjectId = Field(default_factory=PydanticObjectId)
     isnb: str
-    start_read_date: datetime
-    end_read_date: datetime
+    start_read_date: Optional[datetime] = None
+    end_read_date: Optional[datetime] = None
     description: Description
-    rating: int
+    rating: Optional[int] = None
 
 class UpdateBook(BaseModel):
     """

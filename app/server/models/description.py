@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Optional, Annotated
+from typing import Optional
 
-from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, Field, PlainSerializer
+from pydantic import BaseModel, Field
+
 
 class Description(BaseModel):
     title: str = Field(..., min_length=1)
@@ -11,6 +11,7 @@ class Description(BaseModel):
     publisher_name: str
     publishing_date: datetime
     cover_url: str
+    page_number: int
 class UpdateDescription(BaseModel):
     title: Optional[str]
     description: Optional[str]
