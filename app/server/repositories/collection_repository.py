@@ -22,33 +22,33 @@ class ICollectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def create_collection(self, user_id: PydanticObjectId, collection_name: str) -> RepositoryError | None:
+    async def create_collection(self, user: User, collection_name: str) -> RepositoryError | None:
         """
         Create a new collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_name: The name of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
         """
         pass
 
     @abstractmethod
-    async def delete_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId) -> RepositoryError | None:
+    async def delete_collection(self, user: User, collection_id: PydanticObjectId) -> RepositoryError | None:
         """
         Delete a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
         """
         pass
 
     @abstractmethod
-    async def add_book_to_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
+    async def add_book_to_collection(self, user: User, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
         """
         Add a book to a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param book_id: The ID of the book.
         :return: RepositoryError if an error occurs, otherwise None.
@@ -56,11 +56,11 @@ class ICollectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_book_from_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
+    async def remove_book_from_collection(self, user: User, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
         """
         Remove a book from a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param book_id: The ID of the book.
         :return: RepositoryError if an error occurs, otherwise None.
@@ -68,11 +68,11 @@ class ICollectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, new_name: str) -> RepositoryError | None:
+    async def update_collection(self, user: User, collection_id: PydanticObjectId, new_name: str) -> RepositoryError | None:
         """
         Update collection data.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param new_name: The new name of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
