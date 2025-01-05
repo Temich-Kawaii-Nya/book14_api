@@ -7,7 +7,8 @@ SerializedObjectId = Annotated[
     PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
 ]
 
-class Collection(Document):
+class Collection(BaseModel):
+    id: PydanticObjectId = Field(default_factory=PydanticObjectId)
     collection_name: str = Field(..., min_length=1)
     books: List[str]
 class UpdateCollection(BaseModel):

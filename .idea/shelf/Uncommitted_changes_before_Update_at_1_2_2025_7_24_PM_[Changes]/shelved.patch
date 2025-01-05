@@ -1,0 +1,135 @@
+Index: app/server/models/collection.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from typing import List, Optional\r\nfrom beanie import Document\r\nfrom pydantic import BaseModel, Field\r\n\r\n\r\nclass Collection(Document):\r\n    collection_name: str = Field(..., min_length=1)\r\n    books: List[str]\r\nclass UpdateCollection(BaseModel):\r\n    collection_name: Optional[str]\r\n    books: Optional[List[str]]\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/server/models/collection.py b/app/server/models/collection.py
+--- a/app/server/models/collection.py	(revision 92ad59ba37dc06c235842ce8cc2c497e2526bbdb)
++++ b/app/server/models/collection.py	(date 1735820571631)
+@@ -2,7 +2,6 @@
+ from beanie import Document
+ from pydantic import BaseModel, Field
+ 
+-
+ class Collection(Document):
+     collection_name: str = Field(..., min_length=1)
+     books: List[str]
+Index: app/server/routes/users.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from typing import Annotated\r\n\r\nfrom beanie import PydanticObjectId\r\nfrom fastapi import APIRouter, HTTPException, status, Depends\r\nfrom fastapi.security import OAuth2PasswordBearer\r\n\r\nimport jwt\r\nimport logging\r\n\r\nfrom jwt import InvalidTokenError\r\nfrom pydantic import BaseModel\r\nfrom pymongo.errors import DuplicateKeyError\r\n\r\nfrom app.server.models.user import User\r\nfrom passlib.context import CryptContext\r\nfrom datetime import datetime, timedelta\r\nfrom app.server.config import Config\r\n\r\nrouter = APIRouter()\r\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"token\")\r\nlogging.basicConfig(level=logging.INFO)\r\npwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\r\n\r\n\r\nclass Token(BaseModel):\r\n    access_token: str\r\n    token_type: str\r\n\r\n\r\nclass LoginData(BaseModel):\r\n    email: str\r\n    password: str\r\n\r\n\r\nclass SignupData(BaseModel):\r\n    username: str\r\n    password: str\r\n    email: str\r\n\r\nasync def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:\r\n    credentials_exception = HTTPException(\r\n        status_code=status.HTTP_401_UNAUTHORIZED,\r\n        detail=\"Could not validate credentials\",\r\n        headers={\"WWW-Authenticate\": \"Bearer\"},\r\n    )\r\n    try:\r\n        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=\"HS256\")\r\n        username: str = payload.get(\"sub\")\r\n        if username is None:\r\n            raise credentials_exception\r\n    except InvalidTokenError:\r\n        raise credentials_exception\r\n    user = await User.find_one({\"username\": username})\r\n    if user is None:\r\n        raise credentials_exception\r\n    return user\r\n\r\n\r\n@router.post(\"/signup\", status_code=status.HTTP_201_CREATED, response_model=Token)\r\nasync def create_user(signup_data: SignupData):\r\n    user_with_username = await User.find_one({\"username\": signup_data.username})\r\n    if user_with_username is not None:\r\n        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=\"Username already taken\")\r\n    user_with_email = await User.find_one({\"email\": signup_data.email})\r\n    if user_with_email is not None:\r\n        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=\"Email already taken\")\r\n    hashed_password = hash_password(signup_data.password)\r\n    user = User(\r\n        username=signup_data.username,\r\n        email=signup_data.email,\r\n        password=hashed_password,\r\n        created_at=datetime.utcnow(),\r\n        userBooks=[],\r\n        collections=[],\r\n        quotes=[],\r\n        favourites=[])\r\n    await User.insert_one(user)\r\n    access_token = create_access_token(data={\"sub\": user.username})\r\n    return {\"access_token\": access_token, \"token_type\": \"bearer\"}\r\n@router.post(\"/login\", status_code=status.HTTP_200_OK, response_model=Token)\r\nasync def login(user: LoginData):\r\n    try:\r\n        logging.info(\"Attempting to find user by email\")\r\n        user_dict = await User.find_one({\"email\": user.email})\r\n        if not user_dict:\r\n            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)\r\n\r\n        if not verify_password(user.password, user_dict.password):\r\n            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)\r\n        logging.info(user_dict.id)\r\n        access_token = create_access_token(data={\"sub\": user_dict.username})\r\n\r\n        return {\"access_token\": access_token, \"token_type\": \"bearer\"}\r\n    except Exception as e:\r\n        raise HTTPException(status_code=401)\r\n@router.get(\"/\", status_code=status.HTTP_200_OK, response_model=User)\r\nasync def read_user(current_user: Annotated[User, Depends(get_current_user)]):\r\n    return current_user\r\n\r\ndef create_access_token(data: dict, expires_delta: timedelta = None):\r\n    to_encode = data.copy()\r\n    if expires_delta:\r\n        expire = datetime.utcnow() + expires_delta\r\n    else:\r\n        expire = datetime.utcnow() + timedelta(minutes=15)\r\n    to_encode.update({\"exp\": expire})\r\n    encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=\"HS256\")\r\n    return encoded_jwt\r\n\r\n\r\ndef decode_access_token(token: str):\r\n    try:\r\n        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[\"HS256\"])\r\n        return payload\r\n    except jwt.PyJWTError:\r\n        return None\r\n\r\n\r\ndef hash_password(password: str) -> str:\r\n    return pwd_context.hash(password)\r\n\r\n\r\ndef verify_password(plain_password: str, hashed_password: str) -> bool:\r\n    return pwd_context.verify(plain_password, hashed_password)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/server/routes/users.py b/app/server/routes/users.py
+--- a/app/server/routes/users.py	(revision 92ad59ba37dc06c235842ce8cc2c497e2526bbdb)
++++ b/app/server/routes/users.py	(date 1735793654868)
+@@ -1,6 +1,5 @@
+ from typing import Annotated
+ 
+-from beanie import PydanticObjectId
+ from fastapi import APIRouter, HTTPException, status, Depends
+ from fastapi.security import OAuth2PasswordBearer
+ 
+@@ -9,7 +8,6 @@
+ 
+ from jwt import InvalidTokenError
+ from pydantic import BaseModel
+-from pymongo.errors import DuplicateKeyError
+ 
+ from app.server.models.user import User
+ from passlib.context import CryptContext
+@@ -97,6 +95,7 @@
+ async def read_user(current_user: Annotated[User, Depends(get_current_user)]):
+     return current_user
+ 
++
+ def create_access_token(data: dict, expires_delta: timedelta = None):
+     to_encode = data.copy()
+     if expires_delta:
+@@ -106,19 +105,13 @@
+     to_encode.update({"exp": expire})
+     encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm="HS256")
+     return encoded_jwt
+-
+-
+ def decode_access_token(token: str):
+     try:
+         payload = jwt.decode(token, Config.SECRET_KEY, algorithms=["HS256"])
+         return payload
+     except jwt.PyJWTError:
+         return None
+-
+-
+ def hash_password(password: str) -> str:
+     return pwd_context.hash(password)
+-
+-
+ def verify_password(plain_password: str, hashed_password: str) -> bool:
+     return pwd_context.verify(plain_password, hashed_password)
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"7b5486cb-ed0f-4196-867b-417543e0d0ce\" name=\"Changes\" comment=\"authorization with middleware( not working rn)\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/app/server/routes/users.py\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/server/routes/users.py\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;miyazaki1707&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/Temich-Kawaii-Nya/book14_api.git&quot;,\r\n    &quot;accountId&quot;: &quot;cd81829f-5171-413c-bb03-0aaa553aeeeb&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 7\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2r0s4wJ6rpy2ahYOnxmkFldBMpj\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;Python.app.executor&quot;: &quot;Run&quot;,\r\n    &quot;Python.main.executor&quot;: &quot;Run&quot;,\r\n    &quot;Python.users.executor&quot;: &quot;Run&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;auth&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/miyaz/projects/book14_api&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  },\r\n  &quot;keyToStringList&quot;: {\r\n    &quot;DatabaseDriversLRU&quot;: [\r\n      &quot;mongo&quot;\r\n    ]\r\n  }\r\n}</component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102\" />\r\n        <option value=\"bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"7b5486cb-ed0f-4196-867b-417543e0d0ce\" name=\"Changes\" comment=\"\" />\r\n      <created>1735707138368</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1735707138368</updated>\r\n      <workItem from=\"1735707139465\" duration=\"6890000\" />\r\n      <workItem from=\"1735714068175\" duration=\"1632000\" />\r\n      <workItem from=\"1735715721978\" duration=\"5398000\" />\r\n      <workItem from=\"1735726600702\" duration=\"2624000\" />\r\n      <workItem from=\"1735729243500\" duration=\"951000\" />\r\n      <workItem from=\"1735730276672\" duration=\"103000\" />\r\n      <workItem from=\"1735742669245\" duration=\"1553000\" />\r\n      <workItem from=\"1735790961832\" duration=\"1758000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"authorization with middleware( not working rn)\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1735729935371</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1735729935371</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"authorization with middleware( not working rn)\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1735729965423</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1735729965423</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"authorization with middleware( not working rn)\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"authorization with middleware( not working rn)\" />\r\n  </component>\r\n  <component name=\"com.intellij.coverage.CoverageDataManagerImpl\">\r\n    <SUITE FILE_PATH=\"coverage/book14_api$app.coverage\" NAME=\"app Coverage Results\" MODIFIED=\"1735707400386\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/app/server\" />\r\n    <SUITE FILE_PATH=\"coverage/book14_api$main.coverage\" NAME=\"main Coverage Results\" MODIFIED=\"1735792440714\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/app\" />\r\n    <SUITE FILE_PATH=\"coverage/book14_api$users.coverage\" NAME=\"users Coverage Results\" MODIFIED=\"1735729705208\" SOURCE_PROVIDER=\"com.intellij.coverage.DefaultCoverageFileProvider\" RUNNER=\"coverage.py\" COVERAGE_BY_TEST_ENABLED=\"false\" COVERAGE_TRACING_ENABLED=\"false\" WORKING_DIRECTORY=\"$PROJECT_DIR$/app/server/routes\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 92ad59ba37dc06c235842ce8cc2c497e2526bbdb)
++++ b/.idea/workspace.xml	(date 1735820575588)
+@@ -4,8 +4,9 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="authorization with middleware( not working rn)">
++    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="auth fixed">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/app/server/models/collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/models/collection.py" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/app/server/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/users.py" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -88,7 +89,8 @@
+       <workItem from="1735729243500" duration="951000" />
+       <workItem from="1735730276672" duration="103000" />
+       <workItem from="1735742669245" duration="1553000" />
+-      <workItem from="1735790961832" duration="1758000" />
++      <workItem from="1735790961832" duration="3946000" />
++      <workItem from="1735819896287" duration="672000" />
+     </task>
+     <task id="LOCAL-00001" summary="authorization with middleware( not working rn)">
+       <option name="closed" value="true" />
+@@ -106,7 +108,15 @@
+       <option name="project" value="LOCAL" />
+       <updated>1735729965423</updated>
+     </task>
+-    <option name="localTasksCounter" value="3" />
++    <task id="LOCAL-00003" summary="auth fixed">
++      <option name="closed" value="true" />
++      <created>1735793510757</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1735793510757</updated>
++    </task>
++    <option name="localTasksCounter" value="4" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -125,11 +135,12 @@
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="authorization with middleware( not working rn)" />
+-    <option name="LAST_COMMIT_MESSAGE" value="authorization with middleware( not working rn)" />
++    <MESSAGE value="auth fixed" />
++    <option name="LAST_COMMIT_MESSAGE" value="auth fixed" />
+   </component>
+   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+     <SUITE FILE_PATH="coverage/book14_api$app.coverage" NAME="app Coverage Results" MODIFIED="1735707400386" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server" />
+-    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735792440714" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
++    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735793176787" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+     <SUITE FILE_PATH="coverage/book14_api$users.coverage" NAME="users Coverage Results" MODIFIED="1735729705208" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
+   </component>
+ </project>
+\ No newline at end of file

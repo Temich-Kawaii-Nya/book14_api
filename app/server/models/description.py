@@ -1,21 +1,17 @@
 from datetime import datetime
-from typing import Optional, Annotated
+from typing import Optional
 
-from beanie import Document, PydanticObjectId
-from pydantic import BaseModel, Field, PlainSerializer
+from pydantic import BaseModel, Field
 
-SerializedObjectId = Annotated[
-    PydanticObjectId,
-    PlainSerializer(lambda x: str(x), return_type=str, when_used='json')
-]
 
-class Description(Document):
+class Description(BaseModel):
     title: str = Field(..., min_length=1)
     description: str
     author_name: str
     publisher_name: str
     publishing_date: datetime
     cover_url: str
+    page_number: int
 class UpdateDescription(BaseModel):
     title: Optional[str]
     description: Optional[str]

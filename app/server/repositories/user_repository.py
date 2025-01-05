@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
 from beanie import PydanticObjectId
+from pydantic import EmailStr
 
 from app.server.models.user import User
 from app.server.repositories.repository_error import RepositoryError
+
 
 class IUserRepository(ABC):
     """
@@ -11,7 +13,7 @@ class IUserRepository(ABC):
     """
 
     @abstractmethod
-    async def add_user(self, user: User) -> RepositoryError | None:
+    async def add_user(self, user: User):
         """
         Add a new user to the database.
 
@@ -21,7 +23,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete_user(self, user_id: PydanticObjectId) -> RepositoryError | None:
+    async def delete_user(self, user_id: PydanticObjectId):
         """
         Delete a user by their ID.
 
@@ -31,7 +33,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_user(self, user_id: PydanticObjectId, updated_data: dict) -> RepositoryError | None:
+    async def update_user(self, user_id: PydanticObjectId, updated_data: dict):
         """
         Update user data.
 
@@ -42,7 +44,7 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_user_by_id(self, user_id: PydanticObjectId) -> RepositoryError | User:
+    async def get_user_by_id(self, user_id: PydanticObjectId) -> User:
         """
         Retrieve a user by their ID.
 
@@ -52,11 +54,21 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_user_by_email(self, email: str) -> RepositoryError | User:
+    async def get_user_by_email(self, email: str) -> User:
         """
         Retrieve a user by their email.
 
         :param email: The email of the user to retrieve.
+        :return: The User object if found, otherwise None.
+        """
+        pass
+
+    @abstractmethod
+    async def get_user_by_name(self, username: str) -> User:
+        """
+        Retrieve a user by their email.
+
+        :param username: The username of the user to retrieve.
         :return: The User object if found, otherwise None.
         """
         pass
@@ -66,32 +78,33 @@ class UserRepository(IUserRepository, ABC):
     Repository for managing user data.
     """
 
-    async def add_user(self, user: User) -> RepositoryError | None:
+    async def add_user(self, user: User) -> PydanticObjectId:
         existing_user = await User.find_one(User.email == user.email)
         if existing_user:
-            return RepositoryError(message=f"User with email {user.email} already exists.")
+            raise RepositoryError(message=f"User with email {user.email} already exists.", statuscode=400)
         await user.create()
-        return None
+        return user.id
 
-    async def delete_user(self, user_id: PydanticObjectId) -> RepositoryError | None:
+    async def delete_user(self, user_id: PydanticObjectId) -> PydanticObjectId:
         user = await User.get(user_id)
         if not user:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
+            raise RepositoryError(message=f"User with ID {user_id} not found.", statuscode=404)
         await user.delete()
-        return None
+        return user.id
 
-    async def update_user(self, user_id: PydanticObjectId, updated_data: dict) -> RepositoryError | None:
+    async def update_user(self, user_id: PydanticObjectId, updated_data: dict):
         user = await User.get(user_id)
         if not user:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
+            raise RepositoryError(message=f"User with ID {user_id} not found.", statuscode=404)
         for key, value in updated_data.items():
             if hasattr(user, key):
                 setattr(user, key, value)
         await user.save()
-        return None
 
     async def get_user_by_id(self, user_id: PydanticObjectId) -> RepositoryError | User:
         return await User.get(user_id)
 
-    async def get_user_by_email(self, email: str) -> RepositoryError | User:
+    async def get_user_by_email(self, email: EmailStr) -> RepositoryError | User:
         return await User.find_one(User.email == email)
+    async def get_user_by_name(self, username: str) -> RepositoryError | User:
+        return await User.find_one(User.username == username)

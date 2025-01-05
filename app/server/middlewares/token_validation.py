@@ -1,16 +1,66 @@
-from fastapi import Request, HTTPException, middleware
-from starlette.middleware.base import BaseHTTPMiddleware
+from datetime import timedelta, datetime
+from typing import Annotated
+
 import jwt
+from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
+from jwt import InvalidTokenError
+from passlib.context import CryptContext
+from starlette import status
 
-from app.server.config import config
+from app.server.config.config import Config, get_config
 
-@middleware("http")
-async def validate_token(request: Request, call_next):
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
+
+from app.server.models.user import User
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def create_access_token(
+        data: dict,
+        cfg: Config = Depends(get_config),
+        expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, cfg.SECRET_KEY, algorithm="HS256")
+    return encoded_jwt
+
+
+def decode_access_token(token: str, cfg: Config = Depends(get_config)):
     try:
-        token = request.headers.get("Authorization").split(" ")[1]
-        payload = jwt.decode(token, config.SECRET_KEY, algorithms="HS256")
-        request.state.user = payload
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    response = await call_next(request)
-    return response
+        payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=["HS256"])
+        return payload
+    except jwt.PyJWTError:
+        return None
+
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+async def validate_token(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        cfg: Annotated[Config, Depends(get_config)]) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, cfg.SECRET_KEY, algorithms="HS256")
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except InvalidTokenError:
+        raise credentials_exception
+    user = await User.find_one({"username": username})
+    if user is None:
+        raise credentials_exception
+    return user

@@ -14,33 +14,41 @@ class ICollectionRepository(ABC):
     """
 
     @abstractmethod
-    async def create_collection(self, user_id: PydanticObjectId, collection_name: str) -> RepositoryError | None:
+    async def get_collections(self, user: User):
+        pass
+
+    @abstractmethod
+    async def get_collection(self, user: User, collection_id: int):
+        pass
+
+    @abstractmethod
+    async def create_collection(self, user: User, collection_name: str) -> RepositoryError | None:
         """
         Create a new collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_name: The name of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
         """
         pass
 
     @abstractmethod
-    async def delete_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId) -> RepositoryError | None:
+    async def delete_collection(self, user: User, collection_id: PydanticObjectId) -> RepositoryError | None:
         """
         Delete a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
         """
         pass
 
     @abstractmethod
-    async def add_book_to_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
+    async def add_book_to_collection(self, user: User, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
         """
         Add a book to a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param book_id: The ID of the book.
         :return: RepositoryError if an error occurs, otherwise None.
@@ -48,11 +56,11 @@ class ICollectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def remove_book_from_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
+    async def remove_book_from_collection(self, user: User, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
         """
         Remove a book from a collection.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param book_id: The ID of the book.
         :return: RepositoryError if an error occurs, otherwise None.
@@ -60,11 +68,11 @@ class ICollectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, new_name: str) -> RepositoryError | None:
+    async def update_collection(self, user: User, collection_id: PydanticObjectId, new_name: str) -> RepositoryError | None:
         """
         Update collection data.
 
-        :param user_id: The ID of the user.
+        :param user: The model of user.
         :param collection_id: The ID of the collection.
         :param new_name: The new name of the collection.
         :return: RepositoryError if an error occurs, otherwise None.
@@ -76,60 +84,49 @@ class CollectionRepository(ICollectionRepository):
     """
     Implementation of the ICollectionRepository interface for managing collections.
     """
+    async def get_collections(self, user: User):
+        collections = user.collections
+        return collections
 
-    async def create_collection(self, user_id: PydanticObjectId, collection_name: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
+    async def get_collection(self, user: User, collection_id: int):
+        collection = user.collections[collection_id]
+        if not collection:
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
+        return collection
+
+    async def create_collection(self, user: User, collection_name: str):
         new_collection = Collection(collection_name=collection_name, books=[])
-        user_data.collections.append(new_collection)
-        await user_data.save()
-        return None
+        user.collections.append(new_collection)
+        await user.save()
 
-    async def delete_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
-        collection_to_remove = next((col for col in user_data.collections if col.id == collection_id), None)
-        if not collection_to_remove:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
-        user_data.collections.remove(collection_to_remove)
-        await user_data.save()
-        return None
-
-    async def add_book_to_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
-        collection = next((col for col in user_data.collections if col.id == collection_id), None)
+    async def delete_collection(self, user: User, collection_id: int):
+        collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
+        user.collections.remove(collection)
+        await user.save()
+
+    async def add_book_to_collection(self, user: User, collection_id: int, book_id: str):
+        collection = user.collections[collection_id]
+        if not collection:
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.", statuscode=404)
         if book_id in collection.books:
-            return RepositoryError(message=f"Book with ID {book_id} is already in the collection.")
+            raise RepositoryError(message=f"Book with ID {book_id} is already in the collection.")
         collection.books.append(book_id)
-        await user_data.save()
-        return None
+        await user.save()
 
-    async def remove_book_from_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, book_id: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
-        collection = next((col for col in user_data.collections if col.id == collection_id), None)
+    async def remove_book_from_collection(self, user: User, collection_id: int, book_id: str):
+        collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.")
         if book_id not in collection.books:
-            return RepositoryError(message=f"Book with ID {book_id} is not in the collection.")
+            raise RepositoryError(message=f"Book with ID {book_id} is not in the collection.")
         collection.books.remove(book_id)
-        await user_data.save()
-        return None
+        await user.save()
 
-    async def update_collection(self, user_id: PydanticObjectId, collection_id: PydanticObjectId, new_name: str) -> RepositoryError | None:
-        user_data = await User.get(user_id)
-        if not user_data:
-            return RepositoryError(message=f"User with ID {user_id} not found.")
-        collection = next((col for col in user_data.collections if col.id == collection_id), None)
+    async def update_collection(self, user: User, collection_id: int, new_name: str):
+        collection = user.collections[collection_id]
         if not collection:
-            return RepositoryError(message=f"Collection with ID {collection_id} not found.")
+            raise RepositoryError(message=f"Collection with ID {collection_id} not found.")
         collection.collection_name = new_name
-        await user_data.save()
-        return None
+        await user.save()
