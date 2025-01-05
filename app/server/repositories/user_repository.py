@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from beanie import PydanticObjectId
 from pydantic import EmailStr
 
-from app.server.models.user import User
-from app.server.repositories.repository_error import RepositoryError
+from ..models.user import User
+from .repository_error import RepositoryError
 
 
 class IUserRepository(ABC):

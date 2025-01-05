@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from beanie import PydanticObjectId
 
-from app.server.models.collection import Collection
-from app.server.models.user import User
-from app.server.repositories.repository_error import RepositoryError
+from .repository_error import RepositoryError
+from ..models.collection import Collection
+from ..models.user import User
 
 
 class ICollectionRepository(ABC):

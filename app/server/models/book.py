@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from beanie import Document, PydanticObjectId
+from beanie import PydanticObjectId
 from pydantic import BaseModel, Field
 
-from app.server.models.description import Description
+from .description import Description
 
 
 class Book(BaseModel):

@@ -2,10 +2,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from app.server.middlewares.token_validation import validate_token
-from app.server.models.user import User
-from app.server.repositories.collection_repository import CollectionRepository
-from app.server.repositories.repository_error import RepositoryError
+from ..middlewares.token_validation import validate_token
+from ..models.user import User
+from ..repositories.collection_repository import CollectionRepository
+from ..repositories.repository_error import RepositoryError
 
 router = APIRouter()
 collection_repo = CollectionRepository()

@@ -7,9 +7,9 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
 
-from app.server.middlewares.token_validation import validate_token, hash_password, create_access_token, verify_password
-from app.server.models.user import User, SignupData, Token
-from app.server.repositories.user_repository import UserRepository
+from ..middlewares.token_validation import validate_token, hash_password, create_access_token, verify_password
+from ..models.user import User, SignupData, Token
+from ..repositories.user_repository import UserRepository
 
 router = APIRouter()
 

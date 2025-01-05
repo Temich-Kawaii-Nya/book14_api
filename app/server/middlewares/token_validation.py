@@ -8,11 +8,11 @@ from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from starlette import status
 
-from app.server.config.config import Config, get_config
+from ..config.config import Config, get_config
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
 
-from app.server.models.user import User
+from ..models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

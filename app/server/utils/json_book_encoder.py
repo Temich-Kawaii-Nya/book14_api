@@ -1,8 +1,8 @@
 import datetime
 from abc import ABC, abstractmethod
 
-from app.server.models.book import Book
-from app.server.models.description import Description
+from ..models.book import Book
+from ..models.description import Description
 
 
 class IBookJsonEncoder(ABC):

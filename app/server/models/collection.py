@@ -1,5 +1,6 @@
 from typing import List, Optional, Annotated
-from beanie import Document, PydanticObjectId
+
+from beanie import PydanticObjectId
 from pydantic import BaseModel, Field, PlainSerializer
 
 SerializedObjectId = Annotated[

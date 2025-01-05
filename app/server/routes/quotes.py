@@ -4,11 +4,11 @@ from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from app.server.middlewares.token_validation import validate_token
-from app.server.models.quote import CreateQuote
-from app.server.models.user import User
-from app.server.repositories.quote_repository import QuoteRepository
-from app.server.repositories.repository_error import RepositoryError
+from ..middlewares.token_validation import validate_token
+from ..models.quote import CreateQuote
+from ..models.user import User
+from ..repositories.quote_repository import QuoteRepository
+from ..repositories.repository_error import RepositoryError
 
 router = APIRouter()
 quotes_repo = QuoteRepository()

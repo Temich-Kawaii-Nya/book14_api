@@ -3,9 +3,9 @@ from typing import List
 
 from beanie import PydanticObjectId
 
-from app.server.models.book import Book, UpdateBook
-from app.server.models.user import User
-from app.server.repositories.repository_error import RepositoryError
+from ..models.book import Book, UpdateBook
+from ..models.user import User
+from .repository_error import RepositoryError
 
 
 class IBookRepository(ABC):

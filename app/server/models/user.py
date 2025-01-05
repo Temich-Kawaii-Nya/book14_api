@@ -1,11 +1,13 @@
-from beanie import Document, PydanticObjectId
-from pydantic import EmailStr, BaseModel, Field, PlainSerializer
 from datetime import datetime
-from typing import List, Optional, Annotated
+from typing import List, Optional
 
-from app.server.models.book import Book
-from app.server.models.collection import Collection
-from  app.server.models.quote import Quote
+from beanie import Document
+from pydantic import EmailStr, BaseModel, Field
+
+from .book import Book
+from .collection import Collection
+from .quote import Quote
+
 
 class User(Document):
     username: str = Field(..., min_length=3)

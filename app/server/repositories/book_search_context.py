@@ -5,8 +5,8 @@ from typing import Optional
 import requests
 from pydantic import BaseModel
 
-from app.server.models.book import Book
-from app.server.utils.json_book_encoder import GoogleBookJsonEncoder, IBookJsonEncoder
+from ..models.book import Book
+from ..utils.json_book_encoder import GoogleBookJsonEncoder, IBookJsonEncoder
 
 book_encoder: IBookJsonEncoder = GoogleBookJsonEncoder()
 

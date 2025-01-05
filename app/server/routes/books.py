@@ -1,16 +1,14 @@
-import logging
-from http import HTTPStatus
 from typing import Annotated
 
 from beanie import PydanticObjectId
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from app.server.middlewares.token_validation import validate_token
-from app.server.models.book import Book, UpdateBook
-from app.server.models.user import User
-from app.server.repositories.book_repository import BookRepository
-from app.server.repositories.book_search_context import IGoogleBooksContext, SearchBookModel
-from app.server.repositories.repository_error import RepositoryError
+from ..middlewares.token_validation import validate_token
+from ..models.book import Book, UpdateBook
+from ..models.user import User
+from ..repositories.book_repository import BookRepository
+from ..repositories.book_search_context import IGoogleBooksContext, SearchBookModel
+from ..repositories.repository_error import RepositoryError
 
 router = APIRouter()
 book_rep_instance = BookRepository()

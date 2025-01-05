@@ -4,9 +4,9 @@ from typing import Optional, List
 from beanie import PydanticObjectId
 from datetime import datetime
 
-from app.server.models.user import User
-from app.server.models.quote import Quote
-from app.server.repositories.repository_error import RepositoryError
+from ..models.user import User
+from ..models.quote import Quote
+from .repository_error import RepositoryError
 
 
 class IQuoteRepository(ABC):
