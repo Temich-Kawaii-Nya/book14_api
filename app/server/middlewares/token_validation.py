@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta, datetime
 from typing import Annotated
 
@@ -18,19 +19,22 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_access_token(
         data: dict,
-        cfg: Config = Depends(get_config),
         expires_delta: timedelta = None):
+    logging.info("start creating token")
     to_encode = data.copy()
+    cfg = get_config()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, cfg.SECRET_KEY, algorithm="HS256")
+    logging.info("token created")
     return encoded_jwt
 
 
-def decode_access_token(token: str, cfg: Config = Depends(get_config)):
+def decode_access_token(token: str):
+    cfg = get_config()
     try:
         payload = jwt.decode(token, cfg.SECRET_KEY, algorithms=["HS256"])
         return payload
@@ -46,13 +50,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 async def validate_token(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        cfg: Annotated[Config, Depends(get_config)]) -> User:
+        token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    cfg = get_config()
     try:
         payload = jwt.decode(token, cfg.SECRET_KEY, algorithms="HS256")
         username: str = payload.get("sub")

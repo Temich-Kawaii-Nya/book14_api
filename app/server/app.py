@@ -1,8 +1,10 @@
-from functools import lru_cache
+import logging
 
 from fastapi import FastAPI
 
-from .config.config import Config, get_config
+from fastapi import FastAPI
+
+from .config.config import get_config
 from .db.database import init_db
 from .routes.books import router as book_router
 from .routes.collections import router as collection_router
@@ -24,4 +26,5 @@ async def startup():
 
 @app.get("/", tags=["Root"])
 async def read_root() -> dict:
+    logging.info("loading root")
     return {"message": "Welcome to your beanie powered app!"}

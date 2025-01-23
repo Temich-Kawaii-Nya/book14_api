@@ -14,7 +14,7 @@ class IQuoteRepository(ABC):
     Interface for managing quotes related to books.
     """
     @abstractmethod
-    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str) -> RepositoryError | None:
+    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str, pages: int) -> RepositoryError | None:
         """
         Adds a quote to a specific book for a user.
 
@@ -29,7 +29,7 @@ class IQuoteRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str) -> RepositoryError | None:
+    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str, page: int) -> RepositoryError | None:
         """
         Updates the text of a specific quote.
 
@@ -89,17 +89,18 @@ class QuoteRepository(IQuoteRepository, ABC):
     """
     Implementation of the IQuoteRepository interface for managing quotes.
     """
-    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str):
+    async def add_quote_to_book(self, user: User, book_id: PydanticObjectId, text: str, pages: int):
         if not any(book.id == book_id for book in user.userBooks):
             raise RepositoryError(message=f"Book with id {book_id} not found in user's book list", statuscode=404)
-        new_quote = Quote(book_id=book_id, text=text, created_at=datetime.now())
+        new_quote = Quote(book_id=book_id, text=text, created_at=datetime.now(), pages = pages)
         user.quotes.append(new_quote)
         await user.save()
 
-    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str):
+    async def update_quote(self, user: User, quote_id: PydanticObjectId, new_text: str, pages: int):
         for quote in user.quotes:
             if quote.id == quote_id:
                 quote.text = new_text
+                quote.pages = pages
                 await user.save()
                 return
         raise RepositoryError(message=f"Quote with id {quote_id} not found", statuscode=404)

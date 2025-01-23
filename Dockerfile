@@ -17,4 +17,4 @@ COPY --from=build /book14 /book14
 COPY ./app /book14/app
 COPY ./.env /book14
 ENV PYTHONPATH=/book14
-CMD ["python", "app/main.py"]
+CMD ["uvicorn", "app.server.app:app"]

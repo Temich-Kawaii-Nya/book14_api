@@ -21,6 +21,7 @@ def get_user_repository() -> UserRepository:
     return user_rep_instance
 @router.post("/signup", status_code=status.HTTP_201_CREATED, response_model=Token)
 async def create_user(signup_data: SignupData, user_rep = Depends(get_user_repository)):
+    logging.info("processing signup request...")
     user_with_username = await user_rep.get_user_by_name(username=signup_data.username)
     if user_with_username is not None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username already taken")
@@ -38,6 +39,7 @@ async def create_user(signup_data: SignupData, user_rep = Depends(get_user_repos
         quotes=[],
         favourites=[])
     await user_rep.add_user(user=user)
+    logging.info("user added")
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=Token)

@@ -4,14 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="Finished all handlers for collections">
+    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="Dockerfile">
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_2_2025_7_24_PM_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_2_2025_7_24_PM__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_3_2025_7_42_PM_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_3_2025_7_42_PM__Changes_1.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/db/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/db/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/middlewares/token_validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/middlewares/token_validation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/models/quote.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/models/quote.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/repositories/quote_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/repositories/quote_repository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/routes/quotes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/quotes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/users.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +35,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="handlers" />
+        <entry key="$PROJECT_DIR$" value="dev" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -42,7 +49,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Temich-Kawaii-Nya/book14_api.git&quot;,
-    &quot;accountId&quot;: &quot;cd81829f-5171-413c-bb03-0aaa553aeeeb&quot;
+    &quot;accountId&quot;: &quot;ae58d6cd-de7f-41c5-9e5f-2a3280374f1e&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -55,10 +62,13 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Docker.Dockerfile.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
     &quot;Python.app.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.users.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/miyaz/projects/book14_api&quot;,
@@ -75,11 +85,78 @@
     ]
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Артём\PycharmProjects\book14_api" />
+      <recent name="C:\Users\Артём\PycharmProjects\book14_api\app" />
+      <recent name="C:\Users\Артём\PycharmProjects\book14_api\app\server\config" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Docker.Dockerfile">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="book14_api" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Dockerfile" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="sourceFilePath" value="Dockerfile" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.Dockerfile" />
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.23726.102" />
-        <option value="bundled-python-sdk-5e1850174b45-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.23726.102" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-PY-243.21565.199" />
+        <option value="bundled-python-sdk-cab1f2013843-4ae2d6a61b08-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.21565.199" />
       </set>
     </attachedChunks>
   </component>
@@ -102,8 +179,16 @@
       <workItem from="1735819896287" duration="2515000" />
       <workItem from="1735908093723" duration="6904000" />
       <workItem from="1735961365821" duration="3318000" />
-      <workItem from="1735975002311" duration="492000" />
-      <workItem from="1735975513984" duration="3822000" />
+      <workItem from="1736001077542" duration="6422000" />
+      <workItem from="1736048850426" duration="18410000" />
+      <workItem from="1736072350650" duration="2066000" />
+      <workItem from="1737211746209" duration="1280000" />
+      <workItem from="1737265323984" duration="1383000" />
+      <workItem from="1737303781896" duration="5009000" />
+      <workItem from="1737387996639" duration="3765000" />
+      <workItem from="1737497580920" duration="7594000" />
+      <workItem from="1737545906885" duration="1572000" />
+      <workItem from="1737578046842" duration="7552000" />
     </task>
     <task id="LOCAL-00001" summary="authorization with middleware( not working rn)">
       <option name="closed" value="true" />
@@ -161,11 +246,30 @@
       <option name="project" value="LOCAL" />
       <updated>1735918671447</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Added config">
+      <option name="closed" value="true" />
+      <created>1736006999363</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1736006999363</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Dockerfile">
+      <option name="closed" value="true" />
+      <created>1736065188082</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1736065188082</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -184,11 +288,18 @@
     <MESSAGE value="POST request for collections and middleware was added" />
     <MESSAGE value="Changes in collection repository file and add_book_to_collection func was added" />
     <MESSAGE value="Finished all handlers for collections" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finished all handlers for collections" />
+    <MESSAGE value="Added config" />
+    <MESSAGE value="Dockerfile" />
+    <option name="LAST_COMMIT_MESSAGE" value="Dockerfile" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/book14_api$book_search_context.coverage" NAME="book_search_context Coverage Results" MODIFIED="1735981552328" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/repositories" />
     <SUITE FILE_PATH="coverage/book14_api$app.coverage" NAME="app Coverage Results" MODIFIED="1735707400386" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server" />
-    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1735978518644" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
     <SUITE FILE_PATH="coverage/book14_api$users.coverage" NAME="users Coverage Results" MODIFIED="1735729705208" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
+    <SUITE FILE_PATH="coverage/book14_api$token_validation.coverage" NAME="token_validation Coverage Results" MODIFIED="1735966379239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/middlewares" />
+    <SUITE FILE_PATH="coverage/book14_api$database.coverage" NAME="database Coverage Results" MODIFIED="1735971301124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/db" />
+    <SUITE FILE_PATH="coverage/book14_api$books.coverage" NAME="books Coverage Results" MODIFIED="1735982962505" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
+    <SUITE FILE_PATH="coverage/book14_api$main.coverage" NAME="main Coverage Results" MODIFIED="1736067783794" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app" />
+    <SUITE FILE_PATH="coverage/book14_api$quotes.coverage" NAME="quotes Coverage Results" MODIFIED="1735978177427" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/routes" />
   </component>
 </project>
