@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Optional
 
 from beanie import PydanticObjectId
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 
 from ..middlewares.token_validation import validate_token
 from ..models.book import Book, UpdateBook
@@ -112,9 +112,9 @@ async def get_book(
 @router.post("/find/")
 async def find_book(
         user: Annotated[User, Depends(validate_token)],
-        query_model: SearchBookModel):
+        phrase: Optional[str] = Query(default="", alias="phrase")):
     try:
-        book = await book_search.find_book(query_model)
+        book = await book_search.find_book(phrase)
         return book
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)

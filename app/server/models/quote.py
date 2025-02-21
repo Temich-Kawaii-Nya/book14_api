@@ -14,7 +14,9 @@ class Quote(BaseModel):
 
 class UpdateQuote(BaseModel):
     text: Optional[str]
+    pages: Optional[int]
 
 class CreateQuote(BaseModel):
     book_id: PydanticObjectId
     text: str
+    pages: int

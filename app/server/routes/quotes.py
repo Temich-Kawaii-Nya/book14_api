@@ -17,7 +17,7 @@ quotes_repo = QuoteRepository()
 async def get_quotes(book_id: PydanticObjectId, current_user: Annotated[User, Depends(validate_token)]):
     try:
         quotes = await quotes_repo.get_quotes_for_book(current_user, book_id)
-        return {"status": "ok", "quotes": quotes}
+        return quotes
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
@@ -26,7 +26,7 @@ async def get_quotes(book_id: PydanticObjectId, current_user: Annotated[User, De
 async def get_quotes(quote_id: PydanticObjectId, current_user: Annotated[User, Depends(validate_token)]):
     try:
         quote = await quotes_repo.get_quote_by_id(current_user, quote_id)
-        return {"status": "ok", "quotes": quote}
+        return quote
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
@@ -35,8 +35,8 @@ async def get_quotes(quote_id: PydanticObjectId, current_user: Annotated[User, D
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_quote(quote: CreateQuote, current_user: Annotated[User, Depends(validate_token)]):
     try:
-        created_quote = await quotes_repo.add_quote_to_book(current_user, quote.book_id, quote.text)
-        return {"status": "ok", "quote": created_quote}
+        created_quote = await quotes_repo.add_quote_to_book(current_user, quote.book_id, quote.text, quote.pages)
+        return created_quote
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
@@ -46,7 +46,7 @@ async def create_quote(quote: CreateQuote, current_user: Annotated[User, Depends
 async def update_quote(quote_id: PydanticObjectId, new_text: str, current_user: Annotated[User, Depends(validate_token)]):
     try:
         quote = await quotes_repo.update_quote(current_user, quote_id, new_text)
-        return {"status": "ok", "quote": quote}
+        return quote
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:
@@ -58,7 +58,7 @@ async def delete_quote(quote_id: PydanticObjectId,
                        current_user: Annotated[User, Depends(validate_token)]):
     try:
         quote = await quotes_repo.remove_quote_from_book(current_user, quote_id)
-        return {"status": "ok", "quote": quote}
+        return quote
     except RepositoryError as e:
         raise HTTPException(status_code=e.code, detail=e.message)
     except Exception as e:

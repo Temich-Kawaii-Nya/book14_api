@@ -4,21 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="Dockerfile">
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_2_2025_7_24_PM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_2_2025_7_24_PM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_3_2025_7_42_PM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_1_3_2025_7_42_PM__Changes_1.xml" beforeDir="false" />
+    <list default="true" id="7b5486cb-ed0f-4196-867b-417543e0d0ce" name="Changes" comment="Fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/db/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/db/database.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/middlewares/token_validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/middlewares/token_validation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/models/quote.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/models/quote.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/repositories/book_search_context.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/repositories/book_search_context.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/server/repositories/quote_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/repositories/quote_repository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/server/routes/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/routes/books.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/books.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server/routes/quotes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/server/routes/quotes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +181,16 @@
       <workItem from="1737387996639" duration="3765000" />
       <workItem from="1737497580920" duration="7594000" />
       <workItem from="1737545906885" duration="1572000" />
-      <workItem from="1737578046842" duration="7552000" />
+      <workItem from="1737578046842" duration="8788000" />
+      <workItem from="1737653909304" duration="1551000" />
+      <workItem from="1737693244607" duration="1966000" />
+      <workItem from="1737714314677" duration="3129000" />
+      <workItem from="1737776818929" duration="774000" />
+      <workItem from="1737871740042" duration="8271000" />
+      <workItem from="1737986529731" duration="4417000" />
+      <workItem from="1738045082085" duration="3262000" />
+      <workItem from="1738127835853" duration="1542000" />
+      <workItem from="1738345584165" duration="139000" />
     </task>
     <task id="LOCAL-00001" summary="authorization with middleware( not working rn)">
       <option name="closed" value="true" />
@@ -262,7 +264,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736065188082</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Fix">
+      <option name="closed" value="true" />
+      <created>1737643615781</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1737643615781</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -290,7 +300,8 @@
     <MESSAGE value="Finished all handlers for collections" />
     <MESSAGE value="Added config" />
     <MESSAGE value="Dockerfile" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dockerfile" />
+    <MESSAGE value="Fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/book14_api$book_search_context.coverage" NAME="book_search_context Coverage Results" MODIFIED="1735981552328" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/app/server/repositories" />
